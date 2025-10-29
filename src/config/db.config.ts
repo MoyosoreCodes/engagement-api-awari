@@ -12,8 +12,8 @@ export function getDbConfig() {
   const env: DBConfig = validateEnv(dbSchema, 'Mongo DB');
 
   const options: Record<string, any> = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+    // useNewUrlParser: true,
+    // useUnifiedTopology: true,
   };
 
   return {

@@ -8,7 +8,6 @@ import { validateEnv } from '../common/utils';
 const appSchema = z.object({
   NODE_ENV: z.enum(Environments),
   PORT: z.string().nonempty(),
-  SWAGGER_ENABLED: z.string().nonempty(),
 });
 
 function getPackageConfig() {
@@ -41,9 +40,6 @@ export function getAppConfig() {
       port: env.PORT,
     },
     environment,
-    swagger: {
-      enabled: env.SWAGGER_ENABLED,
-    },
   };
 }
 

@@ -14,10 +14,17 @@ async function bootstrap() {
   const { server, environment } =
     configService.getOrThrow<ApplicationConfig>('app');
 
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy:
+        environment === Environments.DEVELOPMENT ? false : undefined,
+      crossOriginEmbedderPolicy: false,
+    }),
+  );
+
   app.enableCors({
     origin: [/http(s)?:\/\/localhost:/],
-    methods: 'POST',
+    methods: 'GET,POST',
     allowedHeaders: [
       'Origin',
       'X-Requested-With',

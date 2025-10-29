@@ -23,6 +23,9 @@ export class Post extends Document {
   @Prop({ default: 0 })
   dislikeCount: number;
 
+  @Prop({ type: Date, default: null })
+  deletedAt?: Date;
+
   toDto(
     interactions: { userId: string; type: InteractionType }[] = [],
     userId?: string,
@@ -34,17 +37,22 @@ export class Post extends Document {
       (i) => i.type === InteractionType.DISLIKE,
     ).length;
 
+    const userInteraction =
+      interactions && userId
+        ? (interactions.find((i) => i.userId === userId)?? undefined)
+        : undefined;
+
     return {
       id: this.id.toString(),
       content: this.content,
       authorId: this.authorId,
-      likeCount: likeCount || this.likeCount,
-      dislikeCount: dislikeCount || this.dislikeCount,
+      likeCount: this.likeCount,
+      dislikeCount: this.dislikeCount,
       interactions,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
-      userInteraction:
-        interactions.find((i) => i.userId == userId)?.type ?? undefined,
+      userInteraction,
+      deletedAt: this.deletedAt as Date | undefined,
     };
   }
 }

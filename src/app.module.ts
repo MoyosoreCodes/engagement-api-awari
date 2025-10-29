@@ -1,15 +1,18 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-
-import serverConfig from './config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { APP_PIPE } from '@nestjs/core';
+import { PostModule } from './post/post.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { PostSeeder } from './post/post.seeder';
 import { MultiValidationPipe, TrimWhitespacePipe } from './common/pipes';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { AppEventEmitter } from './common/events/event-emitter.service';
+import serverConfig from './config';
+import { PubSubModule } from './pubsub/pubsub.module';
 
 @Module({
   imports: [
@@ -17,7 +20,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
       isGlobal: true,
       expandVariables: true,
       load: [...serverConfig],
-      envFilePath: '.env'
+      envFilePath: '.env',
     }),
     MongooseModule.forRootAsync({
       inject: [ConfigService],
@@ -32,9 +35,15 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
         };
       },
     }),
-    EventEmitter2.fo
+    EventEmitterModule.forRoot({
+      wildcard: false,
+      delimiter: '.',
+      maxListeners: 10,
+    }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      autoSchemaFile: true,
+      sortSchema: true,
       graphiql: true,
       subscriptions: {
         'graphql-ws': true,
@@ -45,14 +54,18 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
         return { req };
       },
     }),
+    PubSubModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [
+    AppEventEmitter,
     AppService,
     {
       provide: APP_PIPE,
       useFactory: () => new MultiValidationPipe([new TrimWhitespacePipe()]),
     },
   ],
+  exports: [AppEventEmitter],
 })
 export class AppModule {}

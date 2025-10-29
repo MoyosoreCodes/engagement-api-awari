@@ -18,12 +18,16 @@ export const PostDtoSchema = z.object({
   authorId: z.string(),
   likeCount: z.number().int().min(0),
   dislikeCount: z.number().int().min(0),
-  currentUserLiked: z.boolean().optional(),
-  currentUserDisliked: z.boolean().optional(),
   createdAt: z.date(),
+  deletedAt: z.date().optional(),
   updatedAt: z.date(),
   interactions: z.array(PostInteractionDtoSchema).optional(),
-  userInteraction: z.enum(InteractionType).optional(),
+  userInteraction: z
+    .object({
+      userId: z.string(),
+      type: z.enum(InteractionType),
+    })
+    .optional(),
 });
 
 export const PostUpdateDtoSchema = z.object({
@@ -34,6 +38,15 @@ export const PostUpdateDtoSchema = z.object({
 
 export type PostDtoType = z.infer<typeof PostDtoSchema>;
 export type PostUpdateDtoType = z.infer<typeof PostUpdateDtoSchema>;
+
+@ObjectType()
+export class InteractionDto {
+  @Field()
+  userId: string;
+
+  @Field(() => String)
+  type: InteractionType;
+}
 
 @ObjectType()
 export class PostDto {
@@ -57,6 +70,12 @@ export class PostDto {
 
   @Field(() => Boolean)
   currentUserDisliked: boolean;
+
+  @Field(() => [InteractionDto])
+  interactions: InteractionDto[];
+
+  @Field(() => InteractionDto, { nullable: true })
+  userInteraction?: InteractionDto;
 
   @Field()
   createdAt: Date;

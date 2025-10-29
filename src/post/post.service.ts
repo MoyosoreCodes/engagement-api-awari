@@ -20,25 +20,45 @@ export class PostService {
   ) {}
 
   async findById(id: string) {
-    const post = await this.postModel.findById(id);
+    const post = await this.postModel.findOne({ _id: id, deletedAt: null });
     if (!post) throw new NotFoundException(`Post with id ${id} not found`);
     return post;
   }
 
+  async getAll() {
+    return await this.postModel.find({ deletedAt: null });
+  }
+
   async getPost(postId: string, userId?: string) {
-    const post = await this.findById(postId);
-    const interactions = await this.interactionModel.find({ postId });
+    const post = await this.postModel.findOne({ _id: postId, deletedAt: null });
+    if (!post) throw new NotFoundException('Post not found');
+
+    const interactions = await this.interactionModel.find({
+      postId,
+      deletedAt: null,
+    });
+
     return post.toDto(interactions, userId);
+  }
+
+  async createPost(authorId: string, content: string) {
+    const post = await this.postModel.create({
+      authorId,
+      content,
+      likeCount: 0,
+      dislikeCount: 0,
+    });
+    return post.toDto();
   }
 
   async likePost(postId: string, userId: string) {
     await this.toggleInteraction(postId, userId, InteractionType.LIKE);
-    return this.getPost(postId, userId);
+    return await this.getPost(postId, userId);
   }
 
   async dislikePost(postId: string, userId: string) {
     await this.toggleInteraction(postId, userId, InteractionType.DISLIKE);
-    return this.getPost(postId, userId);
+    return await this.getPost(postId, userId);
   }
 
   private async toggleInteraction(
@@ -52,12 +72,14 @@ export class PostService {
       let newState: InteractionType | null = null;
 
       await session.withTransaction(async () => {
-        const post = await this.postModel.findById(postId).session(session);
+        const post = await this.postModel
+          .findOne({ _id: postId, deletedAt: null })
+          .session(session);
         if (!post)
           throw new NotFoundException(`Post with ID ${postId} not found`);
 
         const existing = await this.interactionModel
-          .findOne({ postId, userId })
+          .findOne({ postId, userId, deletedAt: null })
           .session(session);
 
         previousState = existing?.type ?? null;
@@ -74,59 +96,70 @@ export class PostService {
           dislikeInc = newType === InteractionType.DISLIKE ? 1 : 0;
           newState = newType;
         } else if (existing.type === newType) {
-          await this.interactionModel
-            .deleteOne({ _id: existing._id })
-            .session(session);
+          await this.interactionModel.updateOne(
+            { _id: existing._id },
+            { deletedAt: new Date() },
+            { session },
+          );
           likeInc = newType === InteractionType.LIKE ? -1 : 0;
           dislikeInc = newType === InteractionType.DISLIKE ? -1 : 0;
           newState = null;
         } else {
           await this.interactionModel.updateOne(
             { _id: existing._id },
-            { $set: { type: newType, timestamp: new Date() } },
+            { type: newType, timestamp: new Date() },
             { session },
           );
-          likeInc =
-            newType === InteractionType.LIKE
-              ? 1
-              : previousState === InteractionType.LIKE
-                ? -1
-                : 0;
-          dislikeInc =
-            newType === InteractionType.DISLIKE
-              ? 1
-              : previousState === InteractionType.DISLIKE
-                ? -1
-                : 0;
+          likeInc = newType === InteractionType.LIKE ? 1 : -1;
+          dislikeInc = newType === InteractionType.DISLIKE ? 1 : -1;
           newState = newType;
         }
 
-        await this.postModel.findOneAndUpdate(
+        await this.postModel.updateOne(
           { _id: postId },
           { $inc: { likeCount: likeInc, dislikeCount: dislikeInc } },
           { session },
         );
       });
 
-      (async () => {
-        const post = await this.postModel.findById(postId);
-        this.eventEmitter.emitPostInteractionChanged({
-          postId,
-          userId,
-          previousState,
-          newState,
-          likeCount: post?.likeCount ?? 0,
-          dislikeCount: post?.dislikeCount ?? 0,
-          timestamp: new Date(),
-        } as PostInteractionEvent);
-      })();
+      const post = await this.postModel.findOne({
+        _id: postId,
+        deletedAt: null,
+      });
+
+      this.eventEmitter.emitPostInteractionChanged({
+        postId,
+        userId,
+        previousState,
+        newState,
+        likeCount: post?.likeCount ?? 0,
+        dislikeCount: post?.dislikeCount ?? 0,
+        timestamp: new Date(),
+      } as PostInteractionEvent);
+
+      return post;
     } finally {
       await session.endSession();
     }
   }
 
   async deleteAllPosts(): Promise<void> {
-    await this.postModel.deleteMany({});
-    await this.interactionModel.deleteMany({});
+    const session = await this.connection.startSession();
+    try {
+      await session.withTransaction(async () => {
+        await this.postModel.updateMany(
+          { deletedAt: null },
+          { deletedAt: new Date() },
+          { session },
+        );
+        await this.interactionModel.updateMany(
+          { deletedAt: null },
+          { deletedAt: new Date() },
+          { session },
+        );
+      });
+    } finally {
+      await session.endSession();
+    }
   }
 }

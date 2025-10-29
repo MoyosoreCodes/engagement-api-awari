@@ -8,7 +8,12 @@ import {
 } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { PostService } from './post.service';
-import { PostDto, PostUpdateDto, PostIdSchema } from './post.dto';
+import {
+  PostDto,
+  PostUpdateDto,
+  PostIdSchema,
+  PostContentSchema,
+} from './post.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { PubSubService } from '../pubsub/pubsub.service';
@@ -31,6 +36,12 @@ export class PostResolver {
     return this.postService.getPost(id, user.id);
   }
 
+  @Query(() => PostDto)
+  @UseGuards(AuthGuard)
+  async getAll(@CurrentUser() user: { id: string }) {
+    return this.postService.getAll();
+  }
+
   @Mutation(() => PostDto)
   @UseGuards(AuthGuard)
   async likePost(
@@ -51,15 +62,15 @@ export class PostResolver {
     return this.postService.dislikePost(postId, user.id);
   }
 
-  // @Mutation(() => PostDto)
-  // @UseGuards(AuthGuard)
-  // async createPost(
-  //   @Args('content', new PayloadValidationPipe(PostContentSchema))
-  //   content: string,
-  //   @CurrentUser() user: any,
-  // ) {
-  //   return this.postService.createPost(content, user.id);
-  // }
+  @Mutation(() => PostDto)
+  @UseGuards(AuthGuard)
+  async createPost(
+    @Args('content', new PayloadValidationPipe(PostContentSchema))
+    content: string,
+    @CurrentUser() user: any,
+  ) {
+    return this.postService.createPost(user.id, content);
+  }
 
   @Subscription(() => PostUpdateDto, {
     filter: (payload, variables) => {

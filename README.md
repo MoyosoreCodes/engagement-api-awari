@@ -1,98 +1,138 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Real-Time Engagement API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Real-time engagement system for social media posts with NestJS, GraphQL Subscriptions, MongoDB, and Redis.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Project Structure
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ pnpm install
+```
+/
+├─── src/
+│    ├─── auth/              # Authentication (mock)
+│    ├─── common/            # Shared modules (events, exceptions, filters, middleware etc.)
+│    ├─── config/            # Application configuration (app, db, redis)
+│    ├─── post/              # Core post feature (GraphQL, service, schema)
+│    ├─── pubsub/            # Redis Pub/Sub for real-time updates
+│    └─── main.ts            # Application entry point
+├─── test/                  # End-to-end tests
+├─── .env                   # Environment variables
+├─── package.json           # Project dependencies
+└─── Dockerfile             # Docker configuration
 ```
 
-## Compile and run the project
+## Setup & Execution
 
+### Prerequisites
+- Node.js v20+
+- pnpm v8+
+- Docker v24+
+- Docker Compose v2+
+- Git v2+
+
+### Running the Application
+
+**1. Clone the repository:**
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+git clone <repository-url>
+cd engagement-service
 ```
 
-## Run tests
-
+**2. Start services:**
 ```bash
-# unit tests
-$ pnpm run test
+# Start MongoDB and Redis
+docker-compose up -d
 
-# e2e tests
-$ pnpm run test:e2e
+# Install dependencies
+pnpm install
 
-# test coverage
-$ pnpm run test:cov
+# Start the application
+pnpm run start:dev
 ```
 
-## Deployment
+### API Endpoints
+- GraphQL Playground: http://localhost:3000/graphql
+- WebSocket: ws://localhost:3000/graphql
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+### Stopping Services
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+docker-compose down
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## Data Model
 
-Check out a few resources that may come in handy when working with NestJS:
+**Post Collection:**
+```typescript
+{
+  _id: ObjectId,
+  content: string,
+  authorId: string,
+  likeCount: number,
+  dislikeCount: number,
+  deletedAt: Date | null,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+**PostInteraction Collection:**
+```typescript
+{
+  _id: ObjectId,
+  postId: ObjectId,
+  userId: string,
+  type: "LIKE" | "DISLIKE",
+  timestamp: Date,
+  deletedAt: Date | null
+}
+```
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## API Reference
 
-## Stay in touch
+### Queries
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+**`post(id: ID!): PostDto`**
+- Fetches a single post by its ID.
+
+**`getAll: [PostDto]`**
+- Fetches all posts.
+
+### Mutations
+
+**`createPost(content: String!): PostDto`**
+- Creates a new post.
+
+**`likePost(postId: ID!): PostDto`**
+- Likes a post.
+
+**`dislikePost(postId: ID!): PostDto`**
+- Dislikes a post.
+
+### Subscriptions
+
+**`onPostUpdate(postId: ID!): PostUpdateDto`**
+- Subscribes to real-time updates for a specific post.
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the root of the project with the following variables:
+
+```env
+PORT=3000
+NODE_ENV=development
+DB_HOST=localhost
+DB_PORT=27017
+DB_NAME=engagement-api
+REDIS_HOST=localhost
+REDIS_PORT=6379
+```
+
+---
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+MIT

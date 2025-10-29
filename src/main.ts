@@ -35,6 +35,7 @@ async function bootstrap() {
       'Cache-control',
       'If-None-Match',
       'Access-Control-Allow-Origin',
+      'x-request-id'
     ],
     credentials: true,
   });

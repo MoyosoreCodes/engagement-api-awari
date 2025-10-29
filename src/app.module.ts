@@ -4,7 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { PostModule } from './post/post.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -13,6 +13,7 @@ import { MultiValidationPipe, TrimWhitespacePipe } from './common/pipes';
 import { AppEventEmitter } from './common/events/event-emitter.service';
 import serverConfig from './config';
 import { PubSubModule } from './pubsub/pubsub.module';
+import { AppFilter } from './common/filters/app.filters';
 
 @Module({
   imports: [
@@ -65,6 +66,10 @@ import { PubSubModule } from './pubsub/pubsub.module';
       provide: APP_PIPE,
       useFactory: () => new MultiValidationPipe([new TrimWhitespacePipe()]),
     },
+    {
+      provide: APP_FILTER,
+      useClass: AppFilter
+    }
   ],
   exports: [AppEventEmitter],
 })

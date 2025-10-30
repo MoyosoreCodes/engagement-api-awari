@@ -8,7 +8,7 @@ import {
   PostInteractionSchema,
 } from './schemas.ts/post-interaction.schema';
 import { AppEventEmitter } from '../common/events/event-emitter.service';
-import { PostUpdateHandler } from '../common/events/handlers/post.handler';
+import { PostsEventHandler } from '../common/events/handlers/post.handler';
 import { PubSubModule } from '../pubsub/pubsub.module';
 
 @Module({
@@ -19,6 +19,6 @@ import { PubSubModule } from '../pubsub/pubsub.module';
     ]),
     PubSubModule,
   ],
-  providers: [PostResolver, PostService, AppEventEmitter, PostUpdateHandler],
+  providers: [PostResolver, PostService, AppEventEmitter, PostsEventHandler],
 })
 export class PostModule {}

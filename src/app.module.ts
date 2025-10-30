@@ -8,12 +8,10 @@ import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { PostModule } from './post/post.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PostSeeder } from './post/post.seeder';
 import { MultiValidationPipe, TrimWhitespacePipe } from './common/pipes';
 import { AppEventEmitter } from './common/events/event-emitter.service';
 import serverConfig from './config';
-import { PubSubModule } from './pubsub/pubsub.module';
-import { AppFilter } from './common/filters/app.filters';
+import { AppFilter } from './common/filters/app.filter';
 
 @Module({
   imports: [
@@ -55,7 +53,6 @@ import { AppFilter } from './common/filters/app.filters';
         return { req };
       },
     }),
-    PubSubModule,
     PostModule,
   ],
   controllers: [AppController],

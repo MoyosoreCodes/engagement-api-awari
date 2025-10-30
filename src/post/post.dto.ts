@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ObjectType, Field, ID, Int } from '@nestjs/graphql';
-import { InteractionType } from './schemas.ts/post-interaction.schema';
+import { InteractionType } from '../common/events/types/post.events';
 
 export const PostIdSchema = z.string().min(24).max(24);
 

@@ -1,17 +1,20 @@
+import { AppEvent } from '.';
+
 export enum PostEventType {
-  POST_LIKED = 'post.liked',
-  POST_UNLIKED = 'post.unliked',
-  POST_DISLIKED = 'post.disliked',
-  POST_UNDISLIKED = 'post.undisliked',
-  POST_INTERACTION_CHANGED = 'post.interaction.changed',
+  post_interaction_updated_ = 'post.interaction.updated',
 }
 
-export interface PostInteractionEvent {
+export enum InteractionType {
+  LIKE = 'LIKE',
+  DISLIKE = 'DISLIKE',
+}
+
+export interface PostInteractionEvent extends AppEvent {
+  type: PostEventType.post_interaction_updated_;
   postId: string;
   userId: string;
-  previousState?: 'LIKE' | 'DISLIKE' | null;
-  newState: 'LIKE' | 'DISLIKE' | null;
+  previousState?: InteractionType | null;
+  newState: InteractionType | null;
   likeCount: number;
   dislikeCount: number;
-  timestamp: Date;
 }

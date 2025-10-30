@@ -16,15 +16,12 @@ import {
 } from './post.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { PubSubService } from '../pubsub/pubsub.service';
+import { redisPubSub } from '../common/utils/';
 import { PayloadValidationPipe } from '../common/pipes/';
 
 @Resolver(() => PostDto)
 export class PostResolver {
-  constructor(
-    private postService: PostService,
-    private pubSubService: PubSubService,
-  ) {}
+  constructor(private postService: PostService) {}
 
   @Query(() => PostDto)
   @UseGuards(AuthGuard)
@@ -81,6 +78,6 @@ export class PostResolver {
     @Args('postId', { type: () => ID }, new PayloadValidationPipe(PostIdSchema))
     postId: string,
   ) {
-    return this.pubSubService.asyncIterator(`post_updated_${postId}`);
+    return redisPubSub.asyncIterator(`post_interaction_updated_${postId}`);
   }
 }

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { PostInteractionEvent } from './types/post.events';
+import { AppEvent } from './types/';
 
 @Injectable()
 export class AppEventEmitter {
   constructor(private eventEmitter: EventEmitter2) {}
 
-  emitPostInteractionChanged(event: PostInteractionEvent): void {
-    this.eventEmitter.emit('post.interaction.changed', event);
+  emit<T extends AppEvent>(type: string, payload: T): void {
+    this.eventEmitter.emit(type, payload);
   }
 }

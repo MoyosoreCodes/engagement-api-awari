@@ -2,12 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel, InjectConnection } from '@nestjs/mongoose';
 import { Model, Connection } from 'mongoose';
 import { Post } from './schemas.ts/post.schema';
-import {
-  PostInteraction,
-  InteractionType,
-} from './schemas.ts/post-interaction.schema';
+import { PostInteraction } from './schemas.ts/post-interaction.schema';
 import { AppEventEmitter } from '../common/events/event-emitter.service';
-import { PostInteractionEvent } from '../common/events/types/post.events';
+import {
+  InteractionType,
+  PostEventType,
+  PostInteractionEvent,
+} from '../common/events/types/post.events';
 
 @Injectable()
 export class PostService {
@@ -76,7 +77,7 @@ export class PostService {
           .findOne({ _id: postId, deletedAt: null })
           .session(session);
         if (!post)
-          throw new NotFoundException(`Post with ID ${postId} not found`);
+          throw new NotFoundException(`Post with id ${postId} not found`);
 
         const existing = await this.interactionModel
           .findOne({ postId, userId, deletedAt: null })
@@ -127,14 +128,13 @@ export class PostService {
         deletedAt: null,
       });
 
-      this.eventEmitter.emitPostInteractionChanged({
+      this.eventEmitter.emit(PostEventType.POST_INTERACTION_UPDATED, {
         postId,
         userId,
         previousState,
         newState,
         likeCount: post?.likeCount ?? 0,
         dislikeCount: post?.dislikeCount ?? 0,
-        timestamp: new Date(),
       } as PostInteractionEvent);
 
       return post;

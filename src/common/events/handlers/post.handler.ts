@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import type { PostInteractionEvent } from '../types/post.events';
-import { PubSubService } from '../../../pubsub/pubsub.service';
+import { PostEventType, type PostInteractionEvent } from '../types/post.events';
+import { redisPubSub } from '../../utils';
 
 @Injectable()
-export class PostUpdateHandler {
-  constructor(private pubSubService: PubSubService) {}
+export class PostsEventHandler {
+  constructor() {}
 
-  @OnEvent('post.interaction.changed', { async: true })
-  async handlePostInteractionChanged(event: PostInteractionEvent | null) {
+  @OnEvent(PostEventType.post_interaction_updated_, { async: true })
+  async handlePostInteractionUpdated(event: PostInteractionEvent | null) {
     if (!event || !event?.postId) return;
 
-    await this.pubSubService.publish(`post_updated_${event.postId}`, {
+    await redisPubSub.publish(`post_interaction_updated_${event.postId}`, {
       onPostUpdate: {
         postId: event.postId,
         likeCount: event.likeCount,

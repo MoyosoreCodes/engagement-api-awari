@@ -1,10 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema, Types } from 'mongoose';
-
-export enum InteractionType {
-  LIKE = 'LIKE',
-  DISLIKE = 'DISLIKE',
-}
+import { InteractionType } from '../../common/events/types/post.events';
 
 @Schema({ timestamps: true })
 export class PostInteraction extends Document {

@@ -41,7 +41,7 @@ export class ClientExceptionHandler extends BaseExceptionHandler {
       status,
       body: {
         message: resBody.message || exception.message,
-        errors: resBody.details?.errors || resBody.details || null,
+        errors: resBody.details || resBody.error || null, // Prioritize 'details', then 'error', then null
       },
     };
   }

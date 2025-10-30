@@ -29,7 +29,7 @@ export class ServerExceptionHandler extends BaseExceptionHandler {
         message: this.isProduction
           ? 'Something went wrong, please try again later.'
           : exception.message || 'Internal Server Error',
-        errors: null,
+        errors: this.isProduction ? null : exception.details || null,
       },
     };
   }

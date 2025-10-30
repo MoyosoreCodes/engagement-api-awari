@@ -1,5 +1,5 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -13,6 +13,8 @@ import { AppFilter } from './common/filters/app.filter';
 import { MultiValidationPipe, TrimWhitespacePipe } from './common/pipes';
 import serverConfig from './config';
 import { PostModule } from './post/post.module';
+import { RequestMiddleware } from './common/middleware/request.middleware';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
 
 @Module({
   imports: [
@@ -71,4 +73,8 @@ import { PostModule } from './post/post.module';
   ],
   exports: [AppEventEmitter],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestMiddleware, LoggerMiddleware).forRoutes('*');
+  }
+}

@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { PostEventType, type PostInteractionEvent } from '../types/post.events';
+
 import { redisPubSub } from '../../utils';
+import { PostEventType, type PostInteractionEvent } from '../types/post.events';
 
 @Injectable()
 export class PostsEventHandler {
   constructor() {}
 
-  @OnEvent(PostEventType.post_interaction_updated_, { async: true })
+  @OnEvent(PostEventType.POST_INTERACTION_UPDATED, { async: true })
   async handlePostInteractionUpdated(event: PostInteractionEvent | null) {
     if (!event || !event?.postId) return;
 

@@ -1,7 +1,9 @@
-import { PubSub } from 'graphql-subscriptions';
-import { RedisPubSub } from 'graphql-redis-subscriptions';
-import Redis, { RedisOptions } from 'ioredis';
 import { Logger } from '@nestjs/common';
+
+import { RedisPubSub } from 'graphql-redis-subscriptions';
+import { PubSub } from 'graphql-subscriptions';
+import Redis, { RedisOptions } from 'ioredis';
+
 import { getRedisConfig } from '../../config/redis.config';
 
 const logger = new Logger('PubSub');

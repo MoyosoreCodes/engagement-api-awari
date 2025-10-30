@@ -1,7 +1,7 @@
 import { AppEvent } from '.';
 
 export enum PostEventType {
-  post_interaction_updated_ = 'post.interaction.updated',
+  POST_INTERACTION_UPDATED = 'post.interaction.updated',
 }
 
 export enum InteractionType {
@@ -10,7 +10,7 @@ export enum InteractionType {
 }
 
 export interface PostInteractionEvent extends AppEvent {
-  type: PostEventType.post_interaction_updated_;
+  type: PostEventType.POST_INTERACTION_UPDATED;
   postId: string;
   userId: string;
   previousState?: InteractionType | null;

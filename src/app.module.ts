@@ -1,17 +1,18 @@
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { EventEmitterModule } from '@nestjs/event-emitter';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
-import { PostModule } from './post/post.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { GraphQLModule } from '@nestjs/graphql';
+import { MongooseModule } from '@nestjs/mongoose';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MultiValidationPipe, TrimWhitespacePipe } from './common/pipes';
 import { AppEventEmitter } from './common/events/event-emitter.service';
-import serverConfig from './config';
 import { AppFilter } from './common/filters/app.filter';
+import { MultiValidationPipe, TrimWhitespacePipe } from './common/pipes';
+import serverConfig from './config';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -65,8 +66,8 @@ import { AppFilter } from './common/filters/app.filter';
     },
     {
       provide: APP_FILTER,
-      useClass: AppFilter
-    }
+      useClass: AppFilter,
+    },
   ],
   exports: [AppEventEmitter],
 })

@@ -26,24 +26,21 @@ export default [
     'plugin:prettier/recommended',
   ),
   {
+    files: ['**/*.ts', '**/*.tsx'],
     plugins: {
       '@typescript-eslint': typescriptEslintEslintPlugin,
       'unused-imports': unusedImports,
       'simple-import-sort': simpleImportSort,
     },
-
     languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: path.join(__dirname, 'tsconfig.json'),
+        tsconfigRootDir: __dirname,
+      },
       globals: {
         ...globals.node,
         ...globals.jest,
-      },
-
-      parser: tsParser,
-      ecmaVersion: 2021,
-      sourceType: 'module',
-
-      parserOptions: {
-        project: 'tsconfig.json',
       },
     },
 
@@ -73,7 +70,12 @@ export default [
         },
       ],
 
-      'no-restricted-imports': ['error', { pattern: ['src/*'] }],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: ['src/*'],
+        },
+      ],
 
       'simple-import-sort/imports': [
         'error',
@@ -94,7 +96,6 @@ export default [
       ],
       'simple-import-sort/exports': 'error',
 
-
       '@typescript-eslint/interface-name-prefix': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
@@ -108,20 +109,14 @@ export default [
         },
         {
           selector: 'variable',
-          format: ['camelCase', 'UPPER_CASE'],
+          format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
           leadingUnderscore: 'allow',
         },
         {
           selector: 'parameter',
-          format: ['camelCase'],
+          format: ['camelCase', 'snake_case'],
           leadingUnderscore: 'allow',
           trailingUnderscore: 'allow',
-        },
-        {
-          selector: 'property',
-          format: ['camelCase'],
-          modifiers: ['public'],
-          leadingUnderscore: 'allow',
         },
         {
           selector: ['class', 'interface', 'typeAlias'],
@@ -158,4 +153,4 @@ export default [
       '@typescript-eslint/no-unused-expressions': 'off',
     },
   },
-]
+];

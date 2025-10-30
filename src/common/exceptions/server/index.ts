@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
+
 import { BaseExceptionHandler, IExceptionLogger } from '../interface';
 
 export abstract class ServerException extends HttpException {

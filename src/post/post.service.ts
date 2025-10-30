@@ -1,14 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel, InjectConnection } from '@nestjs/mongoose';
-import { Model, Connection } from 'mongoose';
-import { Post } from './schemas.ts/post.schema';
-import { PostInteraction } from './schemas.ts/post-interaction.schema';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+
+import { Connection, Model } from 'mongoose';
+
 import { AppEventEmitter } from '../common/events/event-emitter.service';
 import {
   InteractionType,
   PostEventType,
   PostInteractionEvent,
 } from '../common/events/types/post.events';
+import { Post } from './schemas.ts/post.schema';
+import { PostInteraction } from './schemas.ts/post-interaction.schema';
 
 @Injectable()
 export class PostService {

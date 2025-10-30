@@ -1,7 +1,9 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { BaseExceptionHandler, IExceptionLogger } from '../interface';
+
 import { ZodSerializationException } from 'nestjs-zod';
-import { handleZodError } from 'src/common/utils';
+
+import { handleZodError } from '../../../common/utils';
+import { BaseExceptionHandler, IExceptionLogger } from '../interface';
 
 export abstract class ClientException extends HttpException {
   constructor(

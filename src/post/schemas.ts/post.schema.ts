@@ -1,7 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+
 import { Document } from 'mongoose';
+
+import { InteractionType } from '../../common/events/types/post.events';
 import { PostDtoType } from '../post.dto';
-import { InteractionType } from './post-interaction.schema';
 
 @Schema({ timestamps: true })
 export class Post extends Document {
@@ -30,16 +32,9 @@ export class Post extends Document {
     interactions: { userId: string; type: InteractionType }[] = [],
     userId?: string,
   ): PostDtoType {
-    const likeCount = interactions.filter(
-      (i) => i.type === InteractionType.LIKE,
-    ).length;
-    const dislikeCount = interactions.filter(
-      (i) => i.type === InteractionType.DISLIKE,
-    ).length;
-
     const userInteraction =
       interactions && userId
-        ? (interactions.find((i) => i.userId === userId)?? undefined)
+        ? (interactions.find((i) => i.userId === userId) ?? undefined)
         : undefined;
 
     return {

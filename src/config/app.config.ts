@@ -1,7 +1,9 @@
 import { registerAs } from '@nestjs/config';
-import path from 'path';
+
 import { readFileSync } from 'fs';
+import path from 'path';
 import { z } from 'zod';
+
 import { Environments } from '../common/enum';
 import { validateEnv } from '../common/utils';
 

@@ -1,18 +1,20 @@
+import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
+
 import { z } from 'zod';
-import { ObjectType, Field, ID, Int } from '@nestjs/graphql';
+
 import { InteractionType } from '../common/events/types/post.events';
 
-export const PostIdSchema = z.string().min(24).max(24);
+export const postIdSchema = z.string().min(24).max(24);
 
-export const PostContentSchema = z.string().min(1).max(5000);
+export const postContentSchema = z.string().min(1).max(5000);
 
-export const PostInteractionDtoSchema = z.object({
+export const postInteractionDtoSchema = z.object({
   userId: z.string(),
   type: z.enum(InteractionType),
   timestamp: z.date().optional(),
 });
 
-export const PostDtoSchema = z.object({
+export const postDtoSchema = z.object({
   id: z.string(),
   content: z.string(),
   authorId: z.string(),
@@ -21,7 +23,7 @@ export const PostDtoSchema = z.object({
   createdAt: z.date(),
   deletedAt: z.date().optional(),
   updatedAt: z.date(),
-  interactions: z.array(PostInteractionDtoSchema).optional(),
+  interactions: z.array(postInteractionDtoSchema).optional(),
   userInteraction: z
     .object({
       userId: z.string(),
@@ -30,14 +32,14 @@ export const PostDtoSchema = z.object({
     .optional(),
 });
 
-export const PostUpdateDtoSchema = z.object({
+export const postUpdateDtoSchema = z.object({
   postId: z.string(),
   likeCount: z.number().int().min(0),
   dislikeCount: z.number().int().min(0),
 });
 
-export type PostDtoType = z.infer<typeof PostDtoSchema>;
-export type PostUpdateDtoType = z.infer<typeof PostUpdateDtoSchema>;
+export type PostDtoType = z.infer<typeof postDtoSchema>;
+export type PostUpdateDtoType = z.infer<typeof postUpdateDtoSchema>;
 
 @ObjectType()
 export class InteractionDto {

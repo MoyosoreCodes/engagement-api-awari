@@ -1,10 +1,12 @@
 import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
+
 import { ZodType } from 'zod';
-import { trimRecursive, validate } from '../utils';
+
 import {
   ClientException,
   PayloadValidationException,
 } from '../exceptions/client';
+import { trimRecursive, validate } from '../utils';
 
 export class TrimWhitespacePipe implements PipeTransform {
   transform(value: any, _metadata: ArgumentMetadata) {
@@ -15,13 +17,13 @@ export class TrimWhitespacePipe implements PipeTransform {
 export class AppValidationPipe<T> implements PipeTransform<T> {
   constructor(
     private readonly schema: ZodType<T>,
-    private readonly ExceptionClass: new (errors: unknown) => ClientException,
+    private readonly exception: new (errors: unknown) => ClientException,
   ) {}
 
   transform(value: unknown, _metadata: ArgumentMetadata): T {
     const { data, error } = validate(this.schema, value);
     if (!error && data) return data;
-    throw new this.ExceptionClass(error);
+    throw new this.exception(error);
   }
 }
 

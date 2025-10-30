@@ -1,10 +1,12 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import helmet from 'helmet';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApplicationConfig } from './config/app.config';
+import { NestFactory } from '@nestjs/core';
+
+import helmet from 'helmet';
+
+import { AppModule } from './app.module';
 import { Environments } from './common/enum';
+import { ApplicationConfig } from './config/app.config';
 
 async function bootstrap() {
   const logger = new Logger();
@@ -35,7 +37,7 @@ async function bootstrap() {
       'Cache-control',
       'If-None-Match',
       'Access-Control-Allow-Origin',
-      'x-request-id'
+      'x-request-id',
     ],
     credentials: true,
   });

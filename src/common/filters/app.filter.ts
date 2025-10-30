@@ -1,12 +1,13 @@
-import { Catch, ArgumentsHost, ExceptionFilter } from '@nestjs/common';
-import { ServerExceptionHandler } from '../exceptions/server';
+import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
+
+import { getAppConfig } from '../../config/app.config';
+import { Environments } from '../enum';
 import {
   ClientExceptionHandler,
   SerializationHandler,
 } from '../exceptions/client';
 import { ExceptionHandler, NestLoggerAdapter } from '../exceptions/interface';
-import { getAppConfig } from 'src/config/app.config';
-import { Environments } from '../enum';
+import { ServerExceptionHandler } from '../exceptions/server';
 
 @Catch()
 export class AppFilter implements ExceptionFilter {

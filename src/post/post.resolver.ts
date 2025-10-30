@@ -1,32 +1,34 @@
+import { UseGuards } from '@nestjs/common';
 import {
-  Resolver,
-  Query,
-  Mutation,
   Args,
   ID,
+  Mutation,
+  Query,
+  Resolver,
   Subscription,
 } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
-import { PostService } from './post.service';
-import {
-  PostDto,
-  PostUpdateDto,
-  PostIdSchema,
-  PostContentSchema,
-} from './post.dto';
+
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { redisPubSub } from '../common/utils/';
 import { PayloadValidationPipe } from '../common/pipes/';
+import { redisPubSub } from '../common/utils/';
+import {
+  postContentSchema,
+  PostDto,
+  postIdSchema,
+  PostUpdateDto,
+} from './post.dto';
+import { PostService } from './post.service';
 
 @Resolver(() => PostDto)
+@UseGuards(AuthGuard)
 export class PostResolver {
   constructor(private postService: PostService) {}
 
   @Query(() => PostDto)
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   async post(
-    @Args('id', { type: () => ID }, new PayloadValidationPipe(PostIdSchema))
+    @Args('id', { type: () => ID }, new PayloadValidationPipe(postIdSchema))
     id: string,
     @CurrentUser() user: { id: string },
   ) {
@@ -34,15 +36,16 @@ export class PostResolver {
   }
 
   @Query(() => PostDto)
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   async getAll(@CurrentUser() user: { id: string }) {
+    console.log(user);
     return this.postService.getAll();
   }
 
   @Mutation(() => PostDto)
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   async likePost(
-    @Args('postId', { type: () => ID }, new PayloadValidationPipe(PostIdSchema))
+    @Args('postId', { type: () => ID }, new PayloadValidationPipe(postIdSchema))
     postId: string,
     @CurrentUser() user: { id: string },
   ) {
@@ -50,9 +53,9 @@ export class PostResolver {
   }
 
   @Mutation(() => PostDto)
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   async dislikePost(
-    @Args('postId', { type: () => ID }, new PayloadValidationPipe(PostIdSchema))
+    @Args('postId', { type: () => ID }, new PayloadValidationPipe(postIdSchema))
     postId: string,
     @CurrentUser() user: { id: string },
   ) {
@@ -60,11 +63,11 @@ export class PostResolver {
   }
 
   @Mutation(() => PostDto)
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   async createPost(
-    @Args('content', new PayloadValidationPipe(PostContentSchema))
+    @Args('content', new PayloadValidationPipe(postContentSchema))
     content: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: { id: string },
   ) {
     return this.postService.createPost(user.id, content);
   }
@@ -75,7 +78,7 @@ export class PostResolver {
     },
   })
   onPostUpdate(
-    @Args('postId', { type: () => ID }, new PayloadValidationPipe(PostIdSchema))
+    @Args('postId', { type: () => ID }, new PayloadValidationPipe(postIdSchema))
     postId: string,
   ) {
     return redisPubSub.asyncIterator(`post_interaction_updated_${postId}`);

@@ -1,5 +1,6 @@
 # Real-Time Engagement Service API
 
+Submission for Awari backend assessment
 Real-time engagement service for social media posts, built with NestJS, GraphQL Subscriptions, MongoDB, and Redis.
 
 ## Project Structure
@@ -10,9 +11,8 @@ Real-time engagement service for social media posts, built with NestJS, GraphQL 
 │    ├─── auth/              # Authentication and authorization (mock)
 │    ├─── common/            # Shared utilities and modules (events, exceptions, middleware, utils, etc.)
 │    ├─── config/            # Application configuration (app, database, Redis, etc.)
-│    ├─── post/              # Core post feature (GraphQL resolver, service, schema, etc.)
+│    ├─── post/              # Core post feature (GraphQL resolver, service, schema, service test etc.)
 │    └─── main.ts            # Application entry point and server initialization
-├─── test/                  # End-to-end (e2e) and integration tests
 ├─── package.json           # Project dependencies and npm scripts
 └─── Dockerfile             # Docker configuration for building a production image
 ```
@@ -21,9 +21,12 @@ Real-time engagement service for social media posts, built with NestJS, GraphQL 
 
 ### Prerequisites
 - Node.js v20+
+- pnpm
 - Docker 
 - Docker Compose 
 - Git
+
+*This project uses **pnpm** for package management. If you don't have it, install it globally by running: `npm install -g pnpm`*
 
 ### Local Run Command
 1.  **Clone the repository:**
@@ -38,6 +41,26 @@ Real-time engagement service for social media posts, built with NestJS, GraphQL 
     docker-compose up -d --build
     ```
     This single command builds the images and starts the NestJS API, MongoDB, and Redis containers.
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the root of the project with the following variables:
+
+```env
+# app
+PORT=3000
+NODE_ENV=development
+
+# database
+MONGODB_URI=mongodb://db:27017/engagement-api?replicaSet=rs0
+
+# redis
+REDIS_HOST=redis
+REDIS_PORT=6379
+```
+---
 
 ### API Endpoint
 - **GraphQL Playground**: `http://localhost:3000/graphql`
@@ -207,24 +230,5 @@ subscription {
 3.  **In Tab 1**, execute the **Subscription** query from **Test Case 4** using the `postId` from step 1.
 4.  **In Tab 2**, execute the **Mutation** from **Test Case 3** using the same `postId`. Remember to include a different `x-user-id` header.
 5.  **Observe the instant update in Tab 1**. The subscription will immediately push the updated `likeCount` to the client.
-
----
-
-## Environment Variables
-
-Create a `.env` file in the root of the project with the following variables:
-
-```env
-# app
-PORT=3000
-NODE_ENV=development
-
-# database
-MONGODB_URI=mongodb://db:27017/engagement-api?replicaSet=rs0
-
-# redis
-REDIS_HOST=redis
-REDIS_PORT=6379
-```
 
 ---

@@ -20,7 +20,7 @@ export class PostInteraction extends Document {
   })
   userId: string;
 
-  @Prop({ required: true, enum: InteractionType })
+  @Prop({ required: true, enum: InteractionType, type: String })
   type: InteractionType;
 
   @Prop({ default: Date.now })

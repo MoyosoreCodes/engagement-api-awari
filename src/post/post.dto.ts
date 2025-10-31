@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { InteractionType } from '../common/events/types/post.events';
 
-export const postIdSchema = z.string().min(24).max(24);
+export const postIdSchema = z.string();
 
 export const postContentSchema = z.string().min(1).max(5000);
 

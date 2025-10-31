@@ -109,7 +109,7 @@ Use the following queries to create and view posts.
 
 **Test Case 1: Create a Post**
 ```graphql
-mutation CreatePost($content: String!) {
+mutation {
   createPost(content: $content) {
     id
     content
@@ -137,7 +137,7 @@ mutation CreatePost($content: String!) {
 **Test Case 2: List All Posts**
 This query retrieves all posts. You can use it to get the `id` of the post you want to use in the next test cases.
 ```graphql
-query GetAll {
+query {
   getAll {
     id
     content
@@ -155,7 +155,7 @@ To like a post, execute the following GraphQL mutation. You must provide a valid
 
 **Query:**
 ```graphql
-mutation LikePost($postId: ID!) {
+mutation {
   likePost(postId: $postId) {
     id
     content
@@ -185,7 +185,7 @@ To subscribe to real-time updates for a post, execute the following GraphQL subs
 
 **Query:**
 ```graphql
-subscription OnPostUpdate($postId: ID!) {
+subscription {
   onPostUpdate(postId: $postId) {
     id
     likeCount
@@ -225,7 +225,6 @@ MONGODB_URI=mongodb://db:27017/engagement-api?replicaSet=rs0
 # redis
 REDIS_HOST=redis
 REDIS_PORT=6379
-
 ```
 
 ---

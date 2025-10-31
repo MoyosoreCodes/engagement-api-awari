@@ -38,20 +38,20 @@ export abstract class BaseExceptionHandler implements ExceptionHandler {
     const gqlHost = GqlArgumentsHost.create(host);
     const ctx = gqlHost.getContext();
     const requestId = ctx.req?.requestId;
+    const { status, body } = this.getResponse(exception);
 
     if (this.options.shouldLog) {
       this.logger.error('GraphQL Exception occurred', {
         requestId,
         message: exception.message,
-        details: exception.details,
+        details: (exception?.details ?? body?.errors) || null,
         stack: exception.stack,
       });
     }
 
-    const { status, body } = this.getResponse(exception);
-
-    throw new GraphQLError(body.message, {
+    throw new GraphQLError(body.message || 'Internal server error', {
       extensions: {
+        success: false,
         status,
         errors: body.errors || null,
         requestId,
@@ -65,6 +65,7 @@ export abstract class BaseExceptionHandler implements ExceptionHandler {
     const response = ctx.getResponse();
     const request = ctx.getRequest();
     const requestId = request.requestId;
+    const { status, body } = this.getResponse(exception);
 
     if (this.options.shouldLog) {
       this.logger.error('HTTP Exception occurred', {
@@ -73,12 +74,10 @@ export abstract class BaseExceptionHandler implements ExceptionHandler {
         url: request.originalUrl,
         name: exception.name || 'Error',
         message: exception.message,
-        details: exception.details,
+        details: (exception?.details ?? body?.errors) || null,
         stack: exception.stack,
       });
     }
-
-    const { status, body } = this.getResponse(exception);
 
     response.status(status).json({
       success: false,

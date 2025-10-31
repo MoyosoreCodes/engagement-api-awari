@@ -21,12 +21,11 @@ import {
 import { PostService } from './post.service';
 
 @Resolver(() => PostDto)
-@UseGuards(AuthGuard)
 export class PostResolver {
   constructor(private postService: PostService) {}
 
   @Query(() => PostDto)
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   async post(
     @Args('id', { type: () => ID }, new PayloadValidationPipe(postIdSchema))
     id: string,
@@ -36,14 +35,14 @@ export class PostResolver {
   }
 
   @Query(() => PostDto)
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   async getAll(@CurrentUser() user: { id: string }) {
     console.log(user);
     return this.postService.getAll();
   }
 
   @Mutation(() => PostDto)
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   async likePost(
     @Args('postId', { type: () => ID }, new PayloadValidationPipe(postIdSchema))
     postId: string,
@@ -53,7 +52,7 @@ export class PostResolver {
   }
 
   @Mutation(() => PostDto)
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   async dislikePost(
     @Args('postId', { type: () => ID }, new PayloadValidationPipe(postIdSchema))
     postId: string,
@@ -63,7 +62,7 @@ export class PostResolver {
   }
 
   @Mutation(() => PostDto)
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   async createPost(
     @Args('content', new PayloadValidationPipe(postContentSchema))
     content: string,

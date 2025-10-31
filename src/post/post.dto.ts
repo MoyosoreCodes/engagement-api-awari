@@ -1,10 +1,30 @@
 import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
 
 import { z } from 'zod';
+import { Types } from 'mongoose';
 
 import { InteractionType } from '../common/events/types/post.events';
 
-export const postIdSchema = z.string();
+export const postIdSchema = z.string().superRefine((data, ctx) => {
+  if (!data.length) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Post id is required',
+      path: ['postId'],
+    });
+    return;
+  }
+
+  const isValidId = Types.ObjectId.isValid(data);
+  if (!isValidId) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Invalid MongoDB ObjectId',
+      path: ['postId'],
+    });
+    return;
+  }
+});
 
 export const postContentSchema = z.string().min(1).max(5000);
 

@@ -10,13 +10,7 @@ export class LoggerMiddleware implements NestMiddleware {
   constructor(private readonly configService: ConfigService) {}
 
   use(req: Request, res: Response, next: NextFunction) {
-    const isGraphQL = req.originalUrl?.includes('/graphql');
-
-    if (isGraphQL) {
-      next();
-      return;
-    }
-
+    if (req.originalUrl.includes('/favicon.ico')) next();
     res.on('finish', () => {
       const { environment, version } = this.configService.get('app');
       const { method, originalUrl, body } = req;

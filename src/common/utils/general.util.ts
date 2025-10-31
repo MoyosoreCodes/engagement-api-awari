@@ -2,7 +2,7 @@ import { ZodError, ZodType } from 'zod';
 
 type ValidationResult<T> = {
   data: T | null;
-  error: null | string | Record<string, string>;
+  error: null | string | Record<string, string | string[]>;
 };
 
 export function validate<T>(
@@ -28,12 +28,17 @@ export function validate<T>(
 }
 
 export function handleZodError(error: unknown) {
-  return error instanceof ZodError
-    ? error.issues.reduce<Record<string, string>>((acc, { path, message }) => {
-        if (path.length) acc[String(path[0])] = message;
-        return acc;
-      }, {})
-    : null;
+  if (!(error instanceof ZodError)) return null;
+
+  return error.issues.reduce<Record<string, string[]>>(
+    (acc, { path, message }) => {
+      const key = path.length ? String(path[0]) : 'general';
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(message);
+      return acc;
+    },
+    {},
+  );
 }
 
 export function validateEnv<T>(schema: ZodType<T>, configName?: string): T {

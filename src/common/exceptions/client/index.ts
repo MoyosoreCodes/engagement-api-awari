@@ -24,7 +24,7 @@ export class PayloadValidationException extends ClientException {
 export class ClientExceptionHandler extends BaseExceptionHandler {
   constructor(logger: IExceptionLogger) {
     super(logger);
-    this.options.shouldLog = false;
+    this.options.shouldLog = true;
   }
 
   canHandle(exception: unknown): boolean {
@@ -41,7 +41,7 @@ export class ClientExceptionHandler extends BaseExceptionHandler {
       status,
       body: {
         message: resBody.message || exception.message,
-        errors: resBody.details || resBody.error || null, // Prioritize 'details', then 'error', then null
+        errors: resBody.details || resBody.error || null,
       },
     };
   }

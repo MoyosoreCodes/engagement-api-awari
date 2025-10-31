@@ -5,6 +5,7 @@ import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
+import { v4 as uuidV4 } from 'uuid';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -42,18 +43,57 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
       delimiter: '.',
       maxListeners: 10,
     }),
+
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
       sortSchema: true,
       graphiql: true,
+      formatError: (error) => ({
+        success: false,
+        status: error.extensions?.status || 500,
+        message: error.message,
+        errors: error.extensions?.errors || null,
+        requestId: error.extensions?.requestId,
+        timestamp: error.extensions?.timestamp,
+      }),
       subscriptions: {
-        'graphql-ws': true,
-        'subscriptions-transport-ws': true,
+        'graphql-ws': {
+          onConnect: (context) => {
+            const headers = context.connectionParams || {};
+            const requestId = headers['x-request-id'] || uuidV4();
+
+            return {
+              headers,
+              requestId,
+            };
+          },
+        },
+        'subscriptions-transport-ws': {
+          onConnect: (connectionParams) => {
+            const headers = connectionParams || {};
+            const requestId = headers['x-request-id'] || uuidV4();
+
+            return {
+              headers,
+              requestId,
+            };
+          },
+        },
       },
-      context: ({ req, connection }) => {
-        if (connection) return { req: connection.context };
-        return { req };
+      context: ({ req, extra }) => {
+        if (req) {
+          const requestId = (req.headers['x-request-id'] as string) || uuidV4();
+          req.requestId = requestId?.trim();
+          return { req };
+        }
+
+        if (extra && extra.requestId)
+          return {
+            req: { headers: extra.headers, requestId: extra.requestId },
+          };
+
+        return { req: { headers: {}, requestId: uuidV4() } };
       },
     }),
     PostModule,

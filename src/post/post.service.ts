@@ -29,7 +29,9 @@ export class PostService {
   }
 
   async getAll() {
-    return await this.postModel.find({ deletedAt: null });
+    const posts = await this.postModel.find({ deletedAt: null });
+    if (!posts.length) throw new NotFoundException('No posts created yet');
+    return posts.map((post) => post.toDto());
   }
 
   async getPost(postId: string, userId?: string) {

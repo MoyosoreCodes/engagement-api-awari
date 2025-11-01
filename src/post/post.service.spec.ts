@@ -137,21 +137,21 @@ describe('PostService', () => {
 
   describe('getAll', () => {
     it('should return all non-deleted posts', async () => {
-      const posts = [createMockPost(), createMockPost({ _id: 'post456' })];
+      const posts = [
+        createMockPost(),
+        createMockPost({ _id: mockPostId.toHexString() }),
+      ];
       (postModel.find as jest.Mock).mockResolvedValue(posts);
-
       const result = await service.getAll();
 
       expect(postModel.find).toHaveBeenCalledWith({ deletedAt: null });
-      expect(result).toEqual(posts);
+      expect(result).toEqual(posts.map((p) => p.toDto([], undefined)));
     });
 
-    it('should return empty array when no posts', async () => {
+    it('should throw NotFoundException when no posts', async () => {
       (postModel.find as jest.Mock).mockResolvedValue([]);
 
-      const result = await service.getAll();
-
-      expect(result).toEqual([]);
+      await expect(service.getAll()).rejects.toThrow('No posts created yet');
     });
   });
 
@@ -360,6 +360,15 @@ describe('PostService', () => {
         { _id: mockPostId.toHexString() },
         { $inc: { likeCount: 0, dislikeCount: 1 } },
         { session: mockSession },
+      );
+      expect(eventEmitter.emit).toHaveBeenCalledWith(
+        PostEventType.POST_INTERACTION_UPDATED,
+        expect.objectContaining({
+          postId: mockPostId.toHexString(),
+          userId: 'user123',
+          previousState: null,
+          newState: InteractionType.DISLIKE,
+        }),
       );
     });
 

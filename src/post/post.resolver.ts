@@ -34,7 +34,7 @@ export class PostResolver {
     return this.postService.getPost(id, user.id);
   }
 
-  @Query(() => PostDto)
+  @Query(() => [PostDto])
   @UseGuards(AuthGuard)
   async getAll(@CurrentUser() user: { id: string }) {
     console.log(user);

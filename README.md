@@ -123,14 +123,20 @@ Use the following queries to create and view posts.
 **1. Create a Post**
 
 ```graphql
-mutation {
-  createPost(content: "This is the first post!") {
+mutation CreatePost($content: String!) {
+  createPost(content: $content) {
     id
     content
     authorId
     likeCount
     dislikeCount
   }
+}
+```
+**Variables:**
+```json
+{
+  "content": "This is the first post!"
 }
 ```
 
@@ -146,9 +152,10 @@ mutation {
 This query retrieves all posts. You can use it to get the `id` of the post for the next test cases.
 
 ```graphql
-query {
+query GetAllPosts {
   getAll {
     id
+    createdAt
     content
     authorId
     likeCount
@@ -159,17 +166,30 @@ query {
 
 ### Interaction & Real-Time Tests
 
-**Test Case 1 (Mutation): Like a Post**
+**Test Case 1 A (Mutation): Toggle like a Post**
 
 ```graphql
-mutation {
-  likePost(postId: "YOUR_POST_ID") {
+mutation LikePost($postId: ID!) {
+  likePost(postId: $postId) {
     id
     content
     likeCount
     dislikeCount
-    currentUserInteraction
+    interactions {
+      userId
+      type
+    }
+    userInteraction {
+      type
+      userId
+    }
   }
+}
+```
+**Variables:**
+```json
+{
+  "postId": "YOUR_POST_ID"
 }
 ```
 
@@ -181,15 +201,56 @@ mutation {
 }
 ```
 
+**Test Case 1 B (Mutation): Toggle disLike on a Post**
+
+```graphql
+mutation DisLikePost($postId: ID!) {
+  dislikePost(postId: $postId) {
+    id
+    content
+    likeCount
+    dislikeCount
+    interactions {
+      userId
+      type
+    }
+    userInteraction {
+      type
+      userId
+    }
+  }
+}
+```
+**Variables:**
+```json
+{
+  "postId": "YOUR_POST_ID"
+}
+```
+
+**Headers:**
+
+```json
+{
+  "x-user-id": "user3"
+}
+```
+
 **Test Case 2 (Subscription): Subscribe to Post Updates**
 
 ```graphql
-subscription {
-  onPostUpdate(postId: "YOUR_POST_ID") {
-    id
+subscription OnPostUpdate($postId: ID!) {
+  onPostUpdate(postId: $postId) {
+    postId
     likeCount
     dislikeCount
   }
+}
+```
+**Variables:**
+```json
+{
+  "postId": "YOUR_POST_ID"
 }
 ```
 

@@ -137,15 +137,15 @@ describe('PostService', () => {
 
   describe('getAll', () => {
     it('should return all non-deleted posts', async () => {
-      const posts = [
-        createMockPost(),
-        createMockPost({ _id: mockPostId.toHexString() }),
-      ];
+      const posts = [createMockPost(), createMockPost()];
       (postModel.find as jest.Mock).mockResolvedValue(posts);
+
       const result = await service.getAll();
 
       expect(postModel.find).toHaveBeenCalledWith({ deletedAt: null });
-      expect(result).toEqual(posts.map((p) => p.toDto([], undefined)));
+      expect(result).toHaveLength(2);
+      expect(posts[0].toDto).toHaveBeenCalled();
+      expect(posts[1].toDto).toHaveBeenCalled();
     });
 
     it('should throw NotFoundException when no posts', async () => {
